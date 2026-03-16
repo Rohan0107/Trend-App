@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-DOCKER_IMAGE = "rohan15543/trend-app"
+        DOCKER_IMAGE = "rohan15543/trend-app"
         DOCKER_TAG = "latest"
     }
 
@@ -31,6 +31,14 @@ DOCKER_IMAGE = "rohan15543/trend-app"
                     sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
                     sh 'docker push ${DOCKER_IMAGE}:${DOCKER_TAG}'
                 }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh 'kubectl apply -f k8s/deployment.yaml'
+                sh 'kubectl apply -f k8s/service.yaml'
+                sh 'kubectl rollout status deployment/trend-app'
             }
         }
     }
